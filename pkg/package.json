@@ -1,0 +1,15 @@
+{
+  "name": "svod-web",
+  "type": "module",
+  "version": "0.3.0",
+  "files": [
+    "svod_web_bg.wasm",
+    "svod_web.js",
+    "svod_web.d.ts"
+  ],
+  "main": "svod_web.js",
+  "types": "svod_web.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

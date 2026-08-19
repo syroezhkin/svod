@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Svod is a modern calculation interpreter designed for engineering computations and technical report generation." />
+    <title>Svod REPL</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23fbf1c7'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='bold' fill='%23af3a03' text-anchor='middle'>S</text></svg>" />
+    <link rel="stylesheet" href="terminal.css" />
+    <link rel="stylesheet" href="main.css" />
+    <script src="jquery.min.js" defer></script>
+    <script src="jquery.terminal.min.js" defer></script>
+    <script src="jquery.mousewheel-min.js" defer></script>
+  </head>
+  <body>
+    <div id="content">
+      <header>
+        <p id="tagline"><strong>Svod</strong> is a modern calculation interpreter designed for engineering computations and technical report generation.</p>
+        <div id="controls">
+          <select id="lang" aria-label="Язык / Language">
+            <option value="en" selected>English</option>
+            <option value="ru">Русский</option>
+          </select>
+        </div>
+      </header>
+      <div id="skeleton-loader" class="skeleton-loader"></div>
+      <div id="terminal"></div>
+      <footer class="hint">Ctrl+L — clear screen · ↑/↓ arrows — history</footer>
+      <div id="help">Try some examples:
+
+  2 + 3 * 4                       -- arithmetic: + - * / **, mod
+  a = 42                          -- variable
+  const k = 1.5                   -- constant; built-ins: #pi, #e, #g, #c
+  F = 1500 kN                     -- quantity with a unit
+  2 m in cm                       -- unit conversion
+  sqrt(16); sin(30°); max(2, 7)   -- functions
+  2 < 3 and not false             -- comparison & logic: == != < <= > >= and or not
+  "text"; 'text'                  -- text value
+  -- comment, --[[ block ]]       -- the two comment styles
+  if 2 > 1 then 5 else 6 end      -- condition
+  begin x = 3; x * 14 end         -- block with a local variable
+  sqrt(a) where a = 16 end        -- local bindings (a is visible in the value)
+  v = choice(75, 50)              -- pick from a list into a variable
+  match v case 75 then "A" case 50 then "B" else "?" end  -- branch on v
+  input N : kN;                   -- input parameter (the browser will ask)
+  A = 10 cm2                      -- cross-section area
+  σ = N / A                       -- axial stress
+  check(σ <= 160 MPa)             -- strength check
+
+Numbers keep ~28 significant digits; output precision is 4 by default.
+Output can be rendered as Typst or LaTeX with :format typst / :format latex.</div>
+    </div>
+    <noscript>Для работы REPL нужен JavaScript. / This REPL requires JavaScript.</noscript>
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
