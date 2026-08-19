@@ -134,6 +134,19 @@ export class Svod {
         return SvodOutput.__wrap(ret);
     }
     /**
+     * Whether `code` is syntactically incomplete (an open block, unclosed
+     * parenthesis or dangling operator), i.e. the REPL should keep reading
+     * continuation lines instead of evaluating.
+     * @param {string} code
+     * @returns {boolean}
+     */
+    is_incomplete(code) {
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_export2, wasm.__wbindgen_export3);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.svod_is_incomplete(this.__wbg_ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
      * Creates a fresh interpreter.
      *
      * A `Default` implementation makes no sense for the JavaScript-facing

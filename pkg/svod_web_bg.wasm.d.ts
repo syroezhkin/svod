@@ -14,6 +14,7 @@ export const commandresult_text: (a: number, b: number) => void;
 export const svod_command: (a: number, b: number, c: number) => number;
 export const svod_highlight: (a: number, b: number, c: number, d: number) => void;
 export const svod_interpret: (a: number, b: number, c: number) => number;
+export const svod_is_incomplete: (a: number, b: number, c: number) => number;
 export const svod_new: () => number;
 export const svod_queue_input: (a: number, b: number, c: number) => void;
 export const svod_reset_input: (a: number) => void;

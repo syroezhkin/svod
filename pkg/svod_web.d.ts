@@ -42,6 +42,12 @@ export class Svod {
      */
     interpret(code: string): SvodOutput;
     /**
+     * Whether `code` is syntactically incomplete (an open block, unclosed
+     * parenthesis or dangling operator), i.e. the REPL should keep reading
+     * continuation lines instead of evaluating.
+     */
+    is_incomplete(code: string): boolean;
+    /**
      * Creates a fresh interpreter.
      *
      * A `Default` implementation makes no sense for the JavaScript-facing
@@ -115,6 +121,7 @@ export interface InitOutput {
     readonly svod_command: (a: number, b: number, c: number) => number;
     readonly svod_highlight: (a: number, b: number, c: number, d: number) => void;
     readonly svod_interpret: (a: number, b: number, c: number) => number;
+    readonly svod_is_incomplete: (a: number, b: number, c: number) => number;
     readonly svod_new: () => number;
     readonly svod_queue_input: (a: number, b: number, c: number) => void;
     readonly svod_reset_input: (a: number) => void;

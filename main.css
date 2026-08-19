@@ -14,6 +14,18 @@
     --mono: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
 }
 
+:root[data-theme="dark"] {
+    --bg0: #282828;
+    --bg1: #3c3836;
+    --bg2: #504945;
+    --bg3: #665c54;
+    --fg1: #ebdbb2;
+    --orange: #fe8019;
+    --blue: #83a598;
+    --gray: #928374;
+    --red: #fb4934;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -47,7 +59,33 @@ header {
 }
 
 #controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 13px;
+}
+
+#controls select,
+#theme {
+    height: 28px;
+    box-sizing: border-box;
+}
+
+#theme {
+    background: var(--bg0);
+    color: var(--fg1);
+    border: 1px solid var(--bg2);
+    border-radius: 4px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#theme:hover {
+    border-color: var(--bg3);
 }
 
 #controls select {
@@ -92,6 +130,12 @@ header {
     font-weight: bold;
 }
 
+/* The "svod> " prompt echoed with each command; colour follows the theme. */
+.repl-prompt {
+    color: var(--orange);
+    font-weight: bold;
+}
+
 /* Raw HTML echo (errors and warnings) keeps its newlines and indentation. */
 .terminal .terminal-output .raw {
     white-space: pre-wrap;
@@ -102,6 +146,22 @@ header {
     font-size: 12px;
     color: var(--gray);
     text-align: center;
+}
+
+.copyright {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--gray);
+    text-align: center;
+}
+
+.copyright a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.copyright a:hover {
+    text-decoration: underline;
 }
 
 #help {

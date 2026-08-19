@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Svod is a modern calculation interpreter designed for engineering computations and technical report generation." />
     <title>Svod REPL</title>
+    <script>try{(function(){var p=localStorage.getItem("svod-theme");if(p==="light"||p==="dark"){document.documentElement.setAttribute("data-theme",p);return;}if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){document.documentElement.setAttribute("data-theme","dark");}})();}catch(e){}</script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23fbf1c7'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='bold' fill='%23af3a03' text-anchor='middle'>S</text></svg>" />
     <link rel="stylesheet" href="terminal.css" />
     <link rel="stylesheet" href="main.css" />
@@ -17,6 +18,7 @@
       <header>
         <p id="tagline"><strong>Svod</strong> is a modern calculation interpreter designed for engineering computations and technical report generation.</p>
         <div id="controls">
+          <button id="theme" type="button" aria-label="Тёмная тема" title="Тёмная тема">☾</button>
           <select id="lang" aria-label="Язык / Language">
             <option value="en" selected>English</option>
             <option value="ru">Русский</option>
@@ -49,6 +51,7 @@
 
 Numbers keep ~28 significant digits; output precision is 4 by default.
 Output can be rendered as Typst or LaTeX with :format typst / :format latex.</div>
+      <footer class="copyright">© 2026 <a href="https://github.com/syroezhkin" target="_blank" rel="noopener">syroezhkin</a></footer>
     </div>
     <noscript>Для работы REPL нужен JavaScript. / This REPL requires JavaScript.</noscript>
     <script type="module" src="index.js"></script>
