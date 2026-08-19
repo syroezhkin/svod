@@ -208,21 +208,6 @@ export class SvodOutput {
         wasm.__wbg_svodoutput_free(ptr, 0);
     }
     /**
-     * Whether the run failed with a parse or runtime error.
-     * @returns {boolean}
-     */
-    get is_error() {
-        const ret = wasm.__wbg_get_svodoutput_is_error(this.__wbg_ptr);
-        return ret !== 0;
-    }
-    /**
-     * Whether the run failed with a parse or runtime error.
-     * @param {boolean} arg0
-     */
-    set is_error(arg0) {
-        wasm.__wbg_set_svodoutput_is_error(this.__wbg_ptr, arg0);
-    }
-    /**
      * The rendered output text (empty when the input produced nothing).
      * @returns {string}
      */

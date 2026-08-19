@@ -58,36 +58,39 @@ let ansi256 = LIGHT_ANSI_256;
 const LANG_KEY = "svod-lang";
 const THEME_KEY = "svod-theme";
 
-function loadLangPref() {
+// localStorage access may throw in private browsing; the prefs are best-effort.
+function loadPref(key) {
     try {
-        return localStorage.getItem(LANG_KEY);
+        return localStorage.getItem(key);
     } catch {
         return null;
     }
 }
 
-function saveLangPref(lang) {
+function savePref(key, value) {
     try {
-        localStorage.setItem(LANG_KEY, lang);
+        localStorage.setItem(key, value);
     } catch {
         // Private browsing or disabled storage: just don't persist.
     }
 }
 
-function loadThemePref() {
-    try {
-        return localStorage.getItem(THEME_KEY);
-    } catch {
-        return null;
-    }
+// The app languages supported by the browser locale mapping: countries where
+// Russian is widely spoken (Russia, Belarus, Ukraine) → ru, everything else → en.
+const SLAVIC_LOCALES = ["ru", "uk", "be"];
+
+// The browser locale mapped to an app language, used only while the user has
+// not chosen a language explicitly.
+function systemLang() {
+    const nav = navigator.language || navigator.userLanguage || "";
+    const code = nav.split("-")[0].toLowerCase();
+    return SLAVIC_LOCALES.includes(code) ? "ru" : "en";
 }
 
-function saveThemePref(theme) {
-    try {
-        localStorage.setItem(THEME_KEY, theme);
-    } catch {
-        // Private browsing or disabled storage: just don't persist.
-    }
+// An explicitly saved choice wins; otherwise derive it from the locale.
+function resolvedLang() {
+    const saved = loadPref(LANG_KEY);
+    return saved === "en" || saved === "ru" ? saved : systemLang();
 }
 
 // "dark" when the OS asks for dark colour scheme, "light" otherwise.
@@ -97,7 +100,7 @@ function systemTheme() {
 
 // An explicitly saved choice wins; otherwise follow the system theme.
 function resolvedTheme() {
-    const saved = loadThemePref();
+    const saved = loadPref(THEME_KEY);
     return saved === "light" || saved === "dark" ? saved : systemTheme();
 }
 
@@ -238,12 +241,11 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
 Вывод можно рендерить в Typst или LaTeX: :format typst / :format latex.`,
     };
 
-    function applyLang(lang) {
-        svod.set_lang(lang);
-        document.getElementById("tagline").innerHTML = taglines[lang];
-        document.querySelector(".hint").textContent = hints[lang];
-        // Only the examples are highlighted; the trailing note (after the last
-        // blank line) stays plain prose, rendered in the sans-serif body font.
+    // Renders the examples block in the current language; the trailing note
+    // (after the last blank line) stays plain prose in the body font. Reads the
+    // active ANSI palette, so it is also called when the theme changes.
+    function renderHelp() {
+        const lang = document.getElementById("lang").value;
         const help = helps[lang];
         const noteAt = help.lastIndexOf("\n\n");
         const examples = noteAt === -1 ? help : help.slice(0, noteAt + 2);
@@ -255,15 +257,20 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
             "</span>";
     }
 
+    function applyLang(lang) {
+        svod.set_lang(lang);
+        document.getElementById("tagline").innerHTML = taglines[lang];
+        document.querySelector(".hint").textContent = hints[lang];
+        renderHelp();
+    }
+
     document.getElementById("lang").addEventListener("change", (event) => {
-        saveLangPref(event.target.value);
+        savePref(LANG_KEY, event.target.value);
         applyLang(event.target.value);
     });
-    const savedLang = loadLangPref();
-    if (savedLang === "en" || savedLang === "ru") {
-        document.getElementById("lang").value = savedLang;
-    }
-    applyLang(document.getElementById("lang").value);
+    const lang = resolvedLang();
+    document.getElementById("lang").value = lang;
+    applyLang(lang);
 
     const themeButton = document.getElementById("theme");
 
@@ -287,32 +294,32 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
         themeButton.title = label;
         themeButton.setAttribute("aria-label", label);
         // Re-highlight the help block so its ANSI colours match the theme.
-        applyLang(document.getElementById("lang").value);
+        renderHelp();
     }
 
     applyTheme(resolvedTheme());
     themeButton.addEventListener("click", () => {
         const next =
             document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-        saveThemePref(next);
+        savePref(THEME_KEY, next);
         applyTheme(next);
     });
     // Follow the OS theme live, but only while the user has not chosen
     // explicitly: an explicit pick always wins.
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-        if (loadThemePref() === null) {
+        if (loadPref(THEME_KEY) === null) {
             applyTheme(e.matches ? "dark" : "light");
         }
     });
     // Some Chromium forks never fire the change event live; they refresh
     // `matchMedia` when the tab regains focus/visibility. Re-check there.
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden && loadThemePref() === null) {
+        if (!document.hidden && loadPref(THEME_KEY) === null) {
             applyTheme(systemTheme());
         }
     });
     window.addEventListener("focus", () => {
-        if (loadThemePref() === null) {
+        if (loadPref(THEME_KEY) === null) {
             applyTheme(systemTheme());
         }
     });

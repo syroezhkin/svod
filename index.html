@@ -16,7 +16,7 @@
   <body>
     <div id="content">
       <header>
-        <p id="tagline"><strong>Svod</strong> is a modern calculation interpreter designed for engineering computations and technical report generation.</p>
+        <p id="tagline"></p>
         <div id="controls">
           <button id="theme" type="button" aria-label="Тёмная тема" title="Тёмная тема">☾</button>
           <select id="lang" aria-label="Язык / Language">
@@ -27,30 +27,8 @@
       </header>
       <div id="skeleton-loader" class="skeleton-loader"></div>
       <div id="terminal"></div>
-      <footer class="hint">Ctrl+L — clear screen · ↑/↓ arrows — history</footer>
-      <div id="help">Try some examples:
-
-  2 + 3 * 4                       -- arithmetic: + - * / **, mod
-  a = 42                          -- variable
-  const k = 1.5                   -- constant; built-ins: #pi, #e, #g, #c
-  F = 1500 kN                     -- quantity with a unit
-  2 m in cm                       -- unit conversion
-  sqrt(16); sin(30°); max(2, 7)   -- functions
-  2 < 3 and not false             -- comparison & logic: == != < <= > >= and or not
-  "text"; 'text'                  -- text value
-  -- comment, --[[ block ]]       -- the two comment styles
-  if 2 > 1 then 5 else 6 end      -- condition
-  begin x = 3; x * 14 end         -- block with a local variable
-  sqrt(a) where a = 16 end        -- local bindings (a is visible in the value)
-  v = choice(75, 50)              -- pick from a list into a variable
-  match v case 75 then "A" case 50 then "B" else "?" end  -- branch on v
-  input N : kN;                   -- input parameter (the browser will ask)
-  A = 10 cm2                      -- cross-section area
-  σ = N / A                       -- axial stress
-  check(σ <= 160 MPa)             -- strength check
-
-Numbers keep ~28 significant digits; output precision is 4 by default.
-Output can be rendered as Typst or LaTeX with :format typst / :format latex.</div>
+      <footer class="hint"></footer>
+      <div id="help"></div>
       <footer class="copyright">© 2026 <a href="https://github.com/syroezhkin" target="_blank" rel="noopener">syroezhkin</a></footer>
     </div>
     <noscript>Для работы REPL нужен JavaScript. / This REPL requires JavaScript.</noscript>

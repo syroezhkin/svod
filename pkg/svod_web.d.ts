@@ -78,10 +78,6 @@ export class SvodOutput {
     free(): void;
     [Symbol.dispose](): void;
     /**
-     * Whether the run failed with a parse or runtime error.
-     */
-    is_error: boolean;
-    /**
      * The rendered output text (empty when the input produced nothing).
      */
     readonly output: string;
@@ -111,10 +107,8 @@ export interface InitOutput {
     readonly __wbg_commandresult_free: (a: number, b: number) => void;
     readonly __wbg_get_commandresult_clear: (a: number) => number;
     readonly __wbg_get_commandresult_quit: (a: number) => number;
-    readonly __wbg_get_svodoutput_is_error: (a: number) => number;
     readonly __wbg_set_commandresult_clear: (a: number, b: number) => void;
     readonly __wbg_set_commandresult_quit: (a: number, b: number) => void;
-    readonly __wbg_set_svodoutput_is_error: (a: number, b: number) => void;
     readonly __wbg_svod_free: (a: number, b: number) => void;
     readonly __wbg_svodoutput_free: (a: number, b: number) => void;
     readonly commandresult_text: (a: number, b: number) => void;
