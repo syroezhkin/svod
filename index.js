@@ -421,6 +421,38 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
 
     document.getElementById("skeleton-loader").classList.add("hidden");
     term.focus(true);
+
+    // On phones the on-screen keyboard shrinks the visual viewport, which CSS
+    // viewport units ignore. When the keyboard is open, keep the header
+    // visible and size the terminal to the remaining space so the input line
+    // stays above the keyboard instead of the browser scrolling it away.
+    let wasKeyboardOpen = false;
+    function sizeTerminal() {
+        const vv = window.visualViewport;
+        const terminal = document.getElementById("terminal");
+        const keyboardOpen = vv && vv.height < window.innerHeight - 80;
+        if (keyboardOpen) {
+            const header = document.querySelector("#content header");
+            const headerH = header ? header.getBoundingClientRect().height : 0;
+            const topOffset = 4;
+            if (!wasKeyboardOpen) {
+                const headerDocTop = header
+                    ? header.getBoundingClientRect().top + window.scrollY
+                    : 0;
+                window.scrollTo(0, Math.max(0, headerDocTop - topOffset));
+            }
+            terminal.style.height = Math.max(160, Math.round(vv.height - headerH - topOffset - 8)) + "px";
+            wasKeyboardOpen = true;
+        } else {
+            terminal.style.height = "700px";
+            wasKeyboardOpen = false;
+        }
+    }
+    window.visualViewport?.addEventListener("resize", sizeTerminal);
+    window.visualViewport?.addEventListener("scroll", sizeTerminal);
+    window.addEventListener("resize", sizeTerminal);
+    window.addEventListener("orientationchange", sizeTerminal);
+    sizeTerminal();
 }
 
 main();

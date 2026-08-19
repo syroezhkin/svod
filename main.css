@@ -102,6 +102,10 @@ header {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(40, 40, 40, 0.18);
+    /* Cap the fixed 700px height on short viewports (e.g. phones in
+       landscape); the soft-keyboard case is handled in index.js via the
+       visual viewport. */
+    max-height: calc(100dvh - 120px);
 
     --background: var(--bg0);
     --color: var(--fg1);
