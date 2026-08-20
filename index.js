@@ -253,7 +253,10 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
         document.getElementById("help").innerHTML =
             ansiToHtml(svod.highlight(examples)) +
             '<span class="help-note">' +
-            escapeHtml(note) +
+            escapeHtml(note).replace(
+                /(:format (?:typst|latex))/g,
+                '<code class="help-code">$1</code>',
+            ) +
             "</span>";
     }
 
@@ -261,6 +264,10 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
         svod.set_lang(lang);
         document.getElementById("tagline").innerHTML = taglines[lang];
         document.querySelector(".hint").textContent = hints[lang];
+        const openFileBtn = document.getElementById("open-file");
+        const openLabel = lang === "ru" ? "Открыть файл" : "Open file";
+        openFileBtn.title = openLabel;
+        openFileBtn.setAttribute("aria-label", openLabel);
         renderHelp();
     }
 
@@ -338,7 +345,17 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
         while (true) {
             const result = svod.interpret(code);
             if (result.pending_prompt) {
-                svod.queue_input(await term.read(result.pending_prompt));
+                // A choice() prompt is a numbered list (one item per line)
+                // followed by the question on the last line; echo the list and
+                // read the answer after the final newline, like the CLI REPL.
+                const prompt = result.pending_prompt;
+                const nl = prompt.lastIndexOf("\n");
+                if (nl !== -1) {
+                    term.echo(ansiToHtml(prompt.slice(0, nl)), { raw: true });
+                    svod.queue_input(await term.read(prompt.slice(nl + 1)));
+                } else {
+                    svod.queue_input(await term.read(prompt));
+                }
                 continue;
             }
             if (result.output) {
@@ -418,6 +435,26 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
 
     // Welcome banner, bold green like the terminal REPL (ANSI 1;32 → Gruvbox).
     term.echo(ansiToHtml("\u001b[1;32m" + welcome_text() + "\u001b[0m"), { raw: true });
+
+    // Loading a .svod file runs it like a CLI script: only the results are
+    // echoed, `input`/`choice()` prompts ask via the usual read mechanism.
+    const openFileBtn = document.getElementById("open-file");
+    const fileInput = document.getElementById("file-input");
+    openFileBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        fileInput.value = "";
+        if (!file) {
+            return;
+        }
+        const source = (await file.text())
+            .replace(/^\uFEFF/, "")
+            .replace(/\r\n/g, "\n");
+        if (!source.trim()) {
+            return;
+        }
+        await runCode(term, source);
+    });
 
     document.getElementById("skeleton-loader").classList.add("hidden");
     term.focus(true);

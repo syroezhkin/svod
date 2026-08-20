@@ -18,12 +18,18 @@
       <header>
         <p id="tagline"></p>
         <div id="controls">
+          <button id="open-file" type="button" aria-label="Открыть файл" title="Открыть файл">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h3.086a1.5 1.5 0 0 1 1.06.44L8 3.793h5.5A1.5 1.5 0 0 1 15 5.293v7.207A1.5 1.5 0 0 1 13.5 14h-11A1.5 1.5 0 0 1 1 12.5v-9z" fill="currentColor" />
+            </svg>
+          </button>
           <button id="theme" type="button" aria-label="Тёмная тема" title="Тёмная тема">☾</button>
           <select id="lang" aria-label="Язык / Language">
             <option value="en" selected>English</option>
             <option value="ru">Русский</option>
           </select>
         </div>
+        <input id="file-input" type="file" accept=".svod,.txt" hidden />
       </header>
       <div id="skeleton-loader" class="skeleton-loader"></div>
       <div id="terminal"></div>

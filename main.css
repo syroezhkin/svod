@@ -66,12 +66,14 @@ header {
 }
 
 #controls select,
-#theme {
+#theme,
+#open-file {
     height: 28px;
     box-sizing: border-box;
 }
 
-#theme {
+#theme,
+#open-file {
     background: var(--bg0);
     color: var(--fg1);
     border: 1px solid var(--bg2);
@@ -84,7 +86,8 @@ header {
     cursor: pointer;
 }
 
-#theme:hover {
+#theme:hover,
+#open-file:hover {
     border-color: var(--bg3);
 }
 
@@ -181,6 +184,15 @@ header {
 .help-note {
     font-family: var(--sans);
     color: var(--fg1);
+}
+
+/* Inline `:format typst` / `:format latex` commands in the help note. */
+.help-note .help-code {
+    font-family: var(--mono);
+    background: var(--bg2);
+    color: var(--fg1);
+    padding: 0 4px;
+    border-radius: 3px;
 }
 
 .skeleton-loader {
