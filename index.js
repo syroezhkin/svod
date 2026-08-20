@@ -416,7 +416,7 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
             greetings: false,
             name: "svod",
             prompt: PROMPT,
-            height: 400,
+            height: 240,
             historySize: 200,
             historyFilter: (line) => line.trim() !== "",
             exit: false,
@@ -457,8 +457,8 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
 
     document.getElementById("skeleton-loader").classList.add("hidden");
     // On touch devices, auto-focusing on load scrolls the page down to the
-    // terminal (below the header and examples strip), and without a user
-    // gesture the keyboard may not open either. Let the user tap the terminal.
+    // terminal (below the header), and without a user gesture the keyboard may
+    // not open either. Let the user tap the terminal.
     if (!window.matchMedia("(pointer: coarse)").matches) {
         term.focus(true);
     }
@@ -469,13 +469,22 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
     // stays above the keyboard instead of the browser scrolling it away.
     // `userHeight` (set by dragging the corner grip) is restored whenever the
     // keyboard closes.
-    const DEFAULT_TERMINAL_HEIGHT = 400;
+    //
+    // The collapsible browser toolbar also shrinks the visual viewport, but by
+    // far less than a keyboard (tens of px vs. a third of the screen). The gap
+    // threshold must sit above that, otherwise the toolbar expanding/collapsing
+    // while the user scrolls is mistaken for a keyboard toggling and the page
+    // jumps to the header. We also react to *resize* only: the toolbar and the
+    // keyboard both emit resize, but plain scrolling emits a stream of scroll
+    // events that must not re-run the layout.
+    const DEFAULT_TERMINAL_HEIGHT = 240;
+    const KEYBOARD_VV_GAP = 150;
     let userHeight = null;
     let wasKeyboardOpen = false;
     function sizeTerminal() {
         const vv = window.visualViewport;
         const terminal = document.getElementById("terminal");
-        const keyboardOpen = vv && vv.height < window.innerHeight - 80;
+        const keyboardOpen = vv && vv.height < window.innerHeight - KEYBOARD_VV_GAP;
         if (keyboardOpen) {
             const header = document.querySelector("#content header");
             const topOffset = 4;
@@ -486,8 +495,8 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
                 window.scrollTo(0, Math.max(0, headerDocTop - topOffset));
             }
             // Distance from the header's top to the terminal's top (includes
-            // the header, the examples strip and the margins), in document
-            // coordinates so it is invariant to scrolling.
+            // the header and the margins), in document coordinates so it is
+            // invariant to scrolling.
             const headerTop = header ? header.getBoundingClientRect().top + window.scrollY : 0;
             const terminalTop = terminal.getBoundingClientRect().top + window.scrollY;
             const gap = terminalTop - headerTop;
@@ -499,7 +508,6 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
         }
     }
     window.visualViewport?.addEventListener("resize", sizeTerminal);
-    window.visualViewport?.addEventListener("scroll", sizeTerminal);
     window.addEventListener("resize", sizeTerminal);
     window.addEventListener("orientationchange", sizeTerminal);
     sizeTerminal();
@@ -537,6 +545,14 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
         dragging = false;
         document.body.classList.remove("resizing");
     });
+    // Belt-and-suspenders for browsers that ignore `touch-action: none`: block
+    // the page scroll during the drag so the gesture always resizes the REPL
+    // instead of scrolling. `passive: false` is required for preventDefault.
+    terminalGrip.addEventListener("touchmove", (e) => {
+        if (dragging) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
     // Keep the scrollbar compensation for the full-bleed examples strip in
     // sync (e.g. toggling devtools or rotating the device changes it).

@@ -73,10 +73,11 @@ header {
     max-width: 720px;
 }
 
-/* Full-bleed horizontal strip of example screenshots between the header and
-   the REPL. It spans the whole viewport (breaking out of #content's max-width).
-   When the images do not fit the row is left-aligned and scrolls horizontally
-   (like the #help code block below); when they fit it is centred. */
+/* Full-bleed horizontal strip of example screenshots at the bottom of the
+   page, just above the copyright. It spans the whole viewport (breaking out of
+   #content's max-width). When the images do not fit the row is left-aligned
+   and scrolls horizontally (like the #help code block below); when they fit it
+   is centred. */
 #examples {
     display: flex;
     justify-content: center;       /* fallback: older browsers clip both sides */
@@ -88,7 +89,7 @@ header {
     padding-left: 16px;
     padding-right: 16px;
     margin-top: 32px;
-    margin-bottom: 32px;
+    margin-bottom: 0;
     width: 100vw;
     /* 100vw includes the vertical scrollbar width on desktop, which shifts the
        strip half a scrollbar left of the visible edge; --sbw (set in JS) lets
@@ -175,7 +176,7 @@ header {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(40, 40, 40, 0.18);
-    /* Cap the fixed 400px height on short viewports (e.g. phones in
+    /* Cap the fixed 240px height on short viewports (e.g. phones in
        landscape); the soft-keyboard case is handled in index.js via the
        visual viewport. */
     max-height: calc(100dvh - 120px);
@@ -266,30 +267,42 @@ header {
 }
 
 .skeleton-loader {
-    height: 400px;
+    height: 240px;
 }
 
-/* Corner grip to resize the terminal height by dragging. */
+/* Corner grip to resize the terminal height by dragging. The invisible hit
+   area is a generous 44px (the recommended minimum touch target) so the tap
+   reliably lands on it instead of the page scroll grabbing the gesture; the
+   visible square is small and solid. `touch-action: none` keeps the resize
+   drag from being taken over by page scrolling. The z-index must exceed jQuery
+   Terminal's invisible `.cmd-editable` input layer (z-index: 500), which
+   otherwise covers the whole bottom command area, swallows the touch and lets
+   the page scroll instead of resizing. */
 #terminal-grip {
     position: absolute;
     right: 0;
     bottom: 0;
-    width: 18px;
-    height: 18px;
+    width: 44px;
+    height: 44px;
     cursor: ns-resize;
-    z-index: 10;
+    z-index: 600;
     touch-action: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
+/* Right triangle (right angle at the bottom-right, apex up-left) as the grip
+   glyph; the transparent borders widen the hit box a little without painting. */
 #terminal-grip::after {
     content: "";
     position: absolute;
-    right: 4px;
-    bottom: 4px;
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid var(--gray);
-    border-bottom: 2px solid var(--gray);
+    right: 6px;
+    bottom: 6px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-top: 6px solid transparent;
+    border-right: 6px solid var(--gray);
+    border-bottom: 6px solid var(--gray);
 }
 
 body.resizing {
