@@ -6,6 +6,7 @@
     <meta name="description" content="Svod is a modern calculation interpreter designed for engineering computations and technical report generation." />
     <title>Svod REPL</title>
     <script>try{(function(){var p=localStorage.getItem("svod-theme");if(p==="light"||p==="dark"){document.documentElement.setAttribute("data-theme",p);return;}if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches){document.documentElement.setAttribute("data-theme","dark");}})();}catch(e){}</script>
+    <script>try{document.documentElement.style.setProperty("--sbw",Math.max(0,window.innerWidth-document.documentElement.clientWidth)+"px");}catch(e){}</script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23fbf1c7'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='bold' fill='%23af3a03' text-anchor='middle'>S</text></svg>" />
     <link rel="stylesheet" href="terminal.css" />
     <link rel="stylesheet" href="main.css" />
@@ -31,6 +32,20 @@
         </div>
         <input id="file-input" type="file" accept=".svod,.txt" hidden />
       </header>
+      <div id="examples" aria-label="Примеры">
+        <a href="img/example_01-01.webp" target="_blank" rel="noopener"><img src="img/example_01-01.webp" alt="Пример 1" /></a>
+        <a href="img/example_01-02.webp" target="_blank" rel="noopener"><img src="img/example_01-02.webp" alt="Пример 2" /></a>
+        <a href="img/example_01-03.webp" target="_blank" rel="noopener"><img src="img/example_01-03.webp" alt="Пример 3" loading="lazy" /></a>
+        <a href="img/example_01-04.webp" target="_blank" rel="noopener"><img src="img/example_01-04.webp" alt="Пример 4" loading="lazy" /></a>
+        <a href="img/example_01-05.webp" target="_blank" rel="noopener"><img src="img/example_01-05.webp" alt="Пример 5" loading="lazy" /></a>
+        <a href="img/example_01-06.webp" target="_blank" rel="noopener"><img src="img/example_01-06.webp" alt="Пример 6" loading="lazy" /></a>
+        <a href="img/example_01-07.webp" target="_blank" rel="noopener"><img src="img/example_01-07.webp" alt="Пример 7" loading="lazy" /></a>
+        <a href="img/example_02-01.webp" target="_blank" rel="noopener"><img src="img/example_02-01.webp" alt="Пример 8" loading="lazy" /></a>
+        <a href="img/example_02-02.webp" target="_blank" rel="noopener"><img src="img/example_02-02.webp" alt="Пример 9" loading="lazy" /></a>
+        <a href="img/example_02-03.webp" target="_blank" rel="noopener"><img src="img/example_02-03.webp" alt="Пример 10" loading="lazy" /></a>
+        <a href="img/example_02-04.webp" target="_blank" rel="noopener"><img src="img/example_02-04.webp" alt="Пример 11" loading="lazy" /></a>
+        <a href="img/example_02-05.webp" target="_blank" rel="noopener"><img src="img/example_02-05.webp" alt="Пример 12" loading="lazy" /></a>
+      </div>
       <div id="skeleton-loader" class="skeleton-loader"></div>
       <div id="terminal"></div>
       <footer class="hint"></footer>

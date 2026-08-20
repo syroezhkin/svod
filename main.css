@@ -37,6 +37,13 @@ body {
     font-family: var(--sans);
 }
 
+/* The full-bleed examples strip spans 100vw, which on desktop includes the
+   vertical scrollbar width; clip the overflow so the page never scrolls
+   horizontally. */
+html {
+    overflow-x: hidden;
+}
+
 #content {
     max-width: 980px;
     margin: 0 auto;
@@ -45,10 +52,18 @@ body {
 
 header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 8px 16px;
     margin-bottom: 16px;
+}
+
+/* On narrow screens the tagline takes its own full-width row. */
+@media (max-width: 640px) {
+    #tagline {
+        flex-basis: 100%;
+        max-width: none;
+    }
 }
 
 #tagline {
@@ -58,11 +73,65 @@ header {
     max-width: 720px;
 }
 
+/* Full-bleed horizontal strip of example screenshots between the header and
+   the REPL. It spans the whole viewport (breaking out of #content's max-width).
+   When the images do not fit the row is left-aligned and scrolls horizontally
+   (like the #help code block below); when they fit it is centred. */
+#examples {
+    display: flex;
+    justify-content: center;       /* fallback: older browsers clip both sides */
+    justify-content: safe center;  /* fits → center, overflows → left + scroll */
+    gap: 16px;
+    overflow-x: auto;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    width: 100vw;
+    /* 100vw includes the vertical scrollbar width on desktop, which shifts the
+       strip half a scrollbar left of the visible edge; --sbw (set in JS) lets
+       us compensate so the overflowing row starts flush at the viewport edge. */
+    margin-left: calc(50% - 50vw + var(--sbw, 0px) / 2);
+    background: var(--bg2);
+}
+
+/* Hide the horizontal scrollbars of the examples strip and the help block;
+   both stay scrollable via wheel, touch or drag. */
+#examples::-webkit-scrollbar,
+#help::-webkit-scrollbar {
+    display: none;
+}
+
+#examples,
+#help {
+    scrollbar-width: none;
+}
+
+#examples a {
+    display: block;
+    flex: 0 0 auto;
+}
+
+#examples img {
+    display: block;
+    height: 300px;
+    width: auto;
+    border: 1px solid var(--bg3);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(40, 40, 40, 0.15);
+    background: var(--bg0);
+}
+
 #controls {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
+    /* Always push the controls to the right edge, whether they share the
+       header row with the tagline or wrap onto their own row. */
+    margin-left: auto;
 }
 
 #controls select,
@@ -101,11 +170,12 @@ header {
 }
 
 #terminal {
+    position: relative;
     border: 1px solid var(--bg3);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(40, 40, 40, 0.18);
-    /* Cap the fixed 700px height on short viewports (e.g. phones in
+    /* Cap the fixed 400px height on short viewports (e.g. phones in
        landscape); the soft-keyboard case is handled in index.js via the
        visual viewport. */
     max-height: calc(100dvh - 120px);
@@ -196,7 +266,35 @@ header {
 }
 
 .skeleton-loader {
-    height: 700px;
+    height: 400px;
+}
+
+/* Corner grip to resize the terminal height by dragging. */
+#terminal-grip {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 18px;
+    height: 18px;
+    cursor: ns-resize;
+    z-index: 10;
+    touch-action: none;
+}
+
+#terminal-grip::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--gray);
+    border-bottom: 2px solid var(--gray);
+}
+
+body.resizing {
+    user-select: none;
+    cursor: ns-resize;
 }
 
 .skeleton-loader.hidden {

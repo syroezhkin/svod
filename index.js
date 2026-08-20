@@ -417,7 +417,7 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
             greetings: false,
             name: "svod",
             prompt: PROMPT,
-            height: 700,
+            height: 400,
             historySize: 200,
             historyFilter: (line) => line.trim() !== "",
             exit: false,
@@ -457,12 +457,21 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
     });
 
     document.getElementById("skeleton-loader").classList.add("hidden");
-    term.focus(true);
+    // On touch devices, auto-focusing on load scrolls the page down to the
+    // terminal (below the header and examples strip), and without a user
+    // gesture the keyboard may not open either. Let the user tap the terminal.
+    if (!window.matchMedia("(pointer: coarse)").matches) {
+        term.focus(true);
+    }
 
     // On phones the on-screen keyboard shrinks the visual viewport, which CSS
     // viewport units ignore. When the keyboard is open, keep the header
     // visible and size the terminal to the remaining space so the input line
     // stays above the keyboard instead of the browser scrolling it away.
+    // `userHeight` (set by dragging the corner grip) is restored whenever the
+    // keyboard closes.
+    const DEFAULT_TERMINAL_HEIGHT = 400;
+    let userHeight = null;
     let wasKeyboardOpen = false;
     function sizeTerminal() {
         const vv = window.visualViewport;
@@ -470,7 +479,6 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
         const keyboardOpen = vv && vv.height < window.innerHeight - 80;
         if (keyboardOpen) {
             const header = document.querySelector("#content header");
-            const headerH = header ? header.getBoundingClientRect().height : 0;
             const topOffset = 4;
             if (!wasKeyboardOpen) {
                 const headerDocTop = header
@@ -478,10 +486,16 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
                     : 0;
                 window.scrollTo(0, Math.max(0, headerDocTop - topOffset));
             }
-            terminal.style.height = Math.max(160, Math.round(vv.height - headerH - topOffset - 8)) + "px";
+            // Distance from the header's top to the terminal's top (includes
+            // the header, the examples strip and the margins), in document
+            // coordinates so it is invariant to scrolling.
+            const headerTop = header ? header.getBoundingClientRect().top + window.scrollY : 0;
+            const terminalTop = terminal.getBoundingClientRect().top + window.scrollY;
+            const gap = terminalTop - headerTop;
+            terminal.style.height = Math.max(160, Math.round(vv.height - gap - topOffset - 8)) + "px";
             wasKeyboardOpen = true;
         } else {
-            terminal.style.height = "700px";
+            terminal.style.height = (userHeight || DEFAULT_TERMINAL_HEIGHT) + "px";
             wasKeyboardOpen = false;
         }
     }
@@ -490,6 +504,49 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
     window.addEventListener("resize", sizeTerminal);
     window.addEventListener("orientationchange", sizeTerminal);
     sizeTerminal();
+
+    // Resize the terminal by dragging its bottom-right corner grip.
+    const terminalGrip = document.createElement("div");
+    terminalGrip.id = "terminal-grip";
+    terminalGrip.setAttribute("aria-hidden", "true");
+    document.getElementById("terminal").appendChild(terminalGrip);
+
+    let dragging = false;
+    let dragStartY = 0;
+    let dragStartHeight = 0;
+    terminalGrip.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        dragStartY = e.clientY;
+        dragStartHeight = parseInt(document.getElementById("terminal").style.height, 10) || DEFAULT_TERMINAL_HEIGHT;
+        document.body.classList.add("resizing");
+        terminalGrip.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    });
+    terminalGrip.addEventListener("pointermove", (e) => {
+        if (!dragging) {
+            return;
+        }
+        const h = Math.max(200, Math.min(1200, dragStartHeight + (e.clientY - dragStartY)));
+        userHeight = Math.round(h);
+        document.getElementById("terminal").style.height = userHeight + "px";
+    });
+    terminalGrip.addEventListener("pointerup", () => {
+        dragging = false;
+        document.body.classList.remove("resizing");
+    });
+    terminalGrip.addEventListener("pointercancel", () => {
+        dragging = false;
+        document.body.classList.remove("resizing");
+    });
+
+    // Keep the scrollbar compensation for the full-bleed examples strip in
+    // sync (e.g. toggling devtools or rotating the device changes it).
+    function updateScrollbarVar() {
+        const sbw = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+        document.documentElement.style.setProperty("--sbw", sbw + "px");
+    }
+    window.addEventListener("resize", updateScrollbarVar);
+    updateScrollbarVar();
 }
 
 main();
