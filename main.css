@@ -110,6 +110,18 @@ header {
     scrollbar-width: none;
 }
 
+/* A mouse drags these strips sideways; the "grabbing" cursor is set by
+   index.js while a drag is in progress. */
+#examples,
+#help {
+    cursor: grab;
+}
+
+#examples.dragging,
+#help.dragging {
+    cursor: grabbing;
+}
+
 #examples a {
     display: block;
     flex: 0 0 auto;

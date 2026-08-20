@@ -184,7 +184,7 @@ async function main() {
 
     const taglines = {
         en: "<strong>Svod</strong> is a modern calculation interpreter designed for engineering computations and technical report generation.",
-        ru: "<strong>Svod</strong> — современный интерпретатор расчётов для инженерных вычислений и формирования технических отчётов.",
+        ru: "<strong>Svod</strong> — это современный интерпретатор расчетов, предназначенный для инженерных вычислений и создания технических отчетов.",
     };
 
     const hints = {
@@ -562,6 +562,95 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
     }
     window.addEventListener("resize", updateScrollbarVar);
     updateScrollbarVar();
+
+    // The examples strip and the help block are horizontally scrollable but
+    // hide their scrollbars, so a mouse has no native way to scroll them: the
+    // wheel scrolls the page vertically and there is no drag. Wire both up.
+    // Touch keeps its native swipe scrolling untouched.
+
+    // The vertical wheel scrolls the strip horizontally; any part of the wheel
+    // delta that cannot be consumed (strip already at an edge) is passed to the
+    // page so the document still scrolls while hovering the strip.
+    function enableWheelScroll(el) {
+        el.addEventListener("wheel", (e) => {
+            if (e.ctrlKey) {
+                return;
+            }
+            if (el.scrollWidth <= el.clientWidth + 1) {
+                return;
+            }
+            const max = el.scrollWidth - el.clientWidth;
+            const before = el.scrollLeft;
+            const target = before + e.deltaY;
+            const clamped = Math.max(0, Math.min(max, target));
+            if (clamped !== before) {
+                el.scrollLeft = clamped;
+                e.preventDefault();
+            }
+            const remaining = target - clamped;
+            if (remaining !== 0) {
+                window.scrollBy(0, remaining);
+            }
+        }, { passive: false });
+    }
+
+    // Mouse drag-to-scroll. A drag must not open the image in a new tab, so if
+    // the pointer travelled more than a few pixels the following click is
+    // suppressed; a plain click still follows the link.
+    function enableDragScroll(el) {
+        let dragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+        let moved = 0;
+
+        el.addEventListener("pointerdown", (e) => {
+            if (e.pointerType !== "mouse" || e.button !== 0) {
+                return;
+            }
+            dragging = true;
+            moved = 0;
+            startX = e.clientX;
+            startScrollLeft = el.scrollLeft;
+            el.classList.add("dragging");
+            e.preventDefault();
+        });
+
+        window.addEventListener("pointermove", (e) => {
+            if (!dragging) {
+                return;
+            }
+            const dx = e.clientX - startX;
+            el.scrollLeft = startScrollLeft - dx;
+            moved = Math.max(moved, Math.abs(dx));
+        });
+
+        function endDrag(e) {
+            if (!dragging) {
+                return;
+            }
+            dragging = false;
+            el.classList.remove("dragging");
+            if (moved > 5) {
+                el.addEventListener("click", (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                }, { capture: true, once: true });
+            }
+        }
+        window.addEventListener("pointerup", endDrag);
+        window.addEventListener("pointercancel", endDrag);
+    }
+
+    const scrollStrips = [
+        document.getElementById("examples"),
+        document.getElementById("help"),
+    ];
+    for (const el of scrollStrips) {
+        if (el) {
+            enableWheelScroll(el);
+            enableDragScroll(el);
+        }
+    }
 }
 
 main();
