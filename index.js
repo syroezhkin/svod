@@ -563,10 +563,12 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
     window.addEventListener("resize", updateScrollbarVar);
     updateScrollbarVar();
 
-    // The examples strip and the help block are horizontally scrollable but
-    // hide their scrollbars, so a mouse has no native way to scroll them: the
-    // wheel scrolls the page vertically and there is no drag. Wire both up.
-    // Touch keeps its native swipe scrolling untouched.
+    // The examples strip is horizontally scrollable but hides its scrollbar, so
+    // a mouse has no native way to scroll it: the wheel scrolls the page
+    // vertically and there is no drag. Wire both up. Touch keeps its native
+    // swipe scrolling untouched. The help block above the gallery is not
+    // clipped, so it stays out of this: it has no scrollbar to hide and its
+    // text selection cursor must not be overridden.
 
     // The vertical wheel scrolls the strip horizontally; any part of the wheel
     // delta that cannot be consumed (strip already at an edge) is passed to the
@@ -643,7 +645,6 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
 
     const scrollStrips = [
         document.getElementById("examples"),
-        document.getElementById("help"),
     ];
     for (const el of scrollStrips) {
         if (el) {

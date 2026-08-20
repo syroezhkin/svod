@@ -112,13 +112,11 @@ header {
 
 /* A mouse drags these strips sideways; the "grabbing" cursor is set by
    index.js while a drag is in progress. */
-#examples,
-#help {
+#examples {
     cursor: grab;
 }
 
-#examples.dragging,
-#help.dragging {
+#examples.dragging {
     cursor: grabbing;
 }
 
