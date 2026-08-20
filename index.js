@@ -1,37 +1,38 @@
 import init, { Svod, setup_panic_hook, welcome_text } from "./pkg/svod_web.js";
 
-// Gruvbox ANSI palettes (light and dark). jQuery Terminal renders ANSI via
-// hardcoded CSS colour keywords and ignores 256-colour codes, so the Rust ANSI
-// output is converted to HTML with the exact Gruvbox colours here instead.
+// Gruvbox ANSI palettes (light-hard and dark-hard). jQuery Terminal renders
+// ANSI via hardcoded CSS colour keywords and ignores 256-colour codes, so the
+// Rust ANSI output is converted to HTML with the exact Gruvbox colours here
+// instead.
 const LIGHT_ANSI_COLORS = {
-    30: "#7c6f64",
+    30: "#f9f5d7",
     31: "#9d0006",
     32: "#79740e",
     33: "#b57614",
     34: "#076678",
     35: "#8f3f71",
     36: "#427b58",
-    37: "#a89984",
-    90: "#7c6f64",
-    91: "#cc241d",
-    92: "#98971a",
-    93: "#d79921",
-    94: "#458588",
-    95: "#b16286",
-    96: "#689d6a",
-    97: "#282828",
+    37: "#7c6f64",
+    90: "#928374",
+    91: "#fb4934",
+    92: "#b8bb26",
+    93: "#fabd2f",
+    94: "#83a598",
+    95: "#d3869b",
+    96: "#8ec07c",
+    97: "#3c3836",
 };
 
 const DARK_ANSI_COLORS = {
-    30: "#928374",
-    31: "#cc241d",
-    32: "#98971a",
-    33: "#d79921",
-    34: "#458588",
-    35: "#b16286",
-    36: "#689d6a",
+    30: "#1d2021",
+    31: "#fb4934",
+    32: "#b8bb26",
+    33: "#fabd2f",
+    34: "#83a598",
+    35: "#d3869b",
+    36: "#8ec07c",
     37: "#a89984",
-    90: "#a89984",
+    90: "#928374",
     91: "#fb4934",
     92: "#b8bb26",
     93: "#fabd2f",
