@@ -214,8 +214,8 @@ async function main() {
   σ = N / A                       -- axial stress
   check(σ <= 160 MPa)             -- strength check
 
-Numbers keep ~28 significant digits; output precision is 4 by default.
-Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
+Output can be rendered as Typst or LaTeX with :format typst / :format latex.
+`,
         ru: `Попробуйте примеры:
 
   2 + 3 * 4                       -- арифметика: + - * / **, mod
@@ -237,7 +237,6 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.`,
   σ = N / A                       -- напряжение в стержне
   check(σ <= 160 МПа)             -- проверка прочности
 
-Числа хранятся с ~28 значащими цифрами; точность вывода по умолчанию 4.
 Вывод можно рендерить в Typst или LaTeX: :format typst / :format latex.`,
     };
 
