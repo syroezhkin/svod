@@ -1,7 +1,7 @@
 {
   "name": "svod-web",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "files": [
     "svod_web_bg.wasm",
     "svod_web.js",

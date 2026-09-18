@@ -147,13 +147,21 @@ export class Svod {
         return ret !== 0;
     }
     /**
-     * Creates a fresh interpreter.
+     * Creates a fresh interpreter for `lang` (`"ru"` selects Russian, anything
+     * else English).
+     *
+     * The language is applied before the interpreter is built, so the built-in
+     * constants materialize in the right locale — the browser does not choose
+     * the language until after construction otherwise.
      *
      * A `Default` implementation makes no sense for the JavaScript-facing
      * constructor, so the clippy `new_without_default` lint is allowed here.
+     * @param {string} lang
      */
-    constructor() {
-        const ret = wasm.svod_new();
+    constructor(lang) {
+        const ptr0 = passStringToWasm0(lang, wasm.__wbindgen_export2, wasm.__wbindgen_export3);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.svod_new(ptr0, len0);
         this.__wbg_ptr = ret;
         SvodFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -177,6 +185,9 @@ export class Svod {
     }
     /**
      * Sets the output language: `"ru"` selects Russian, anything else English.
+     *
+     * Affects subsequent output and messages; values already bound in the
+     * session keep the language they were materialized in.
      * @param {string} lang
      */
     set_lang(lang) {

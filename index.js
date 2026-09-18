@@ -1,60 +1,76 @@
 import init, { Svod, setup_panic_hook, welcome_text } from "./pkg/svod_web.js";
 
-// Gruvbox ANSI palettes (light-hard and dark-hard). jQuery Terminal renders
-// ANSI via hardcoded CSS colour keywords and ignores 256-colour codes, so the
-// Rust ANSI output is converted to HTML with the exact Gruvbox colours here
-// instead.
-const LIGHT_ANSI_COLORS = {
-    30: "#f9f5d7",
-    31: "#9d0006",
-    32: "#79740e",
-    33: "#b57614",
-    34: "#076678",
-    35: "#8f3f71",
-    36: "#427b58",
-    37: "#7c6f64",
-    90: "#928374",
-    91: "#fb4934",
-    92: "#b8bb26",
-    93: "#fabd2f",
-    94: "#83a598",
-    95: "#d3869b",
-    96: "#8ec07c",
-    97: "#3c3836",
+// The Tomorrow palettes (light "Tomorrow", dark "Tomorrow-Night") as the slot
+// RGB triples. The report and syntax formatter bakes the canonical dark palette
+// (mirroring the GUI) and `ansiToHtml` re-colors each truecolor run to the
+// active theme's slot below. Diagnostics use standard ANSI codes, which the
+// same function maps through the ANSI tables below.
+const TOMORROW = {
+    light: {
+        red: [200, 40, 41], // #c82829
+        orange: [245, 135, 31], // #f5871f
+        yellow: [234, 183, 0], // #eab700
+        green: [113, 140, 0], // #718c00
+        aqua: [62, 153, 159], // #3e999f
+        blue: [66, 113, 174], // #4271ae
+        purple: [137, 89, 168], // #8959a8
+        gray: [142, 144, 140], // #8e908c
+        foreground: [77, 77, 76], // #4d4d4c
+    },
+    dark: {
+        red: [204, 102, 102], // #cc6666
+        orange: [222, 147, 95], // #de935f
+        yellow: [240, 198, 116], // #f0c674
+        green: [181, 189, 104], // #b5bd68
+        aqua: [138, 190, 183], // #8abeb7
+        blue: [129, 162, 190], // #81a2be
+        purple: [178, 148, 187], // #b294bb
+        gray: [150, 152, 150], // #969896
+        foreground: [197, 200, 198], // #c5c8c6
+    },
 };
 
-const DARK_ANSI_COLORS = {
-    30: "#1d2021",
-    31: "#fb4934",
-    32: "#b8bb26",
-    33: "#fabd2f",
-    34: "#83a598",
-    35: "#d3869b",
-    36: "#8ec07c",
-    37: "#a89984",
-    90: "#928374",
-    91: "#fb4934",
-    92: "#b8bb26",
-    93: "#fabd2f",
-    94: "#83a598",
-    95: "#d3869b",
-    96: "#8ec07c",
-    97: "#ebdbb2",
+// The palette slot a truecolor value belongs to, or null when it is not a
+// palette color (then it renders as-is).
+function tomorrowSlot(r, g, b) {
+    for (const theme of ["light", "dark"]) {
+        for (const slot of Object.keys(TOMORROW[theme])) {
+            const [sr, sg, sb] = TOMORROW[theme][slot];
+            if (sr === r && sg === g && sb === b) {
+                return slot;
+            }
+        }
+    }
+    return null;
+}
+
+// Standard ANSI foreground codes → Tomorrow slot names, so the ANSI colors are
+// derived from `TOMORROW` and the two cannot drift apart.
+const ANSI_SLOT = {
+    30: "gray", 90: "gray",
+    31: "red", 91: "red",
+    32: "green", 92: "green",
+    33: "yellow", 93: "yellow",
+    34: "blue", 94: "blue",
+    35: "purple", 95: "purple",
+    36: "aqua", 96: "aqua",
+    37: "foreground", 97: "foreground",
 };
 
-// 256-colour foregrounds used by the shared highlighter (only the comment
-// grey 245 today), mapped onto the Gruvbox palette.
-const LIGHT_ANSI_256 = {
-    245: "#7c6f64",
-};
+// The CSS colors of the ANSI codes per theme, built from `TOMORROW`.
+function ansiColorsFor(theme) {
+    const colors = {};
+    for (const [code, slot] of Object.entries(ANSI_SLOT)) {
+        colors[code] = "rgb(" + TOMORROW[theme][slot].join(",") + ")";
+    }
+    return colors;
+}
 
-const DARK_ANSI_256 = {
-    245: "#928374",
-};
+const ANSI_COLORS = { light: ansiColorsFor("light"), dark: ansiColorsFor("dark") };
 
 // The palette active for the current theme; `ansiToHtml` reads these.
-let ansiColors = LIGHT_ANSI_COLORS;
-let ansi256 = LIGHT_ANSI_256;
+let ansiColors = ANSI_COLORS.light;
+let themeMode = "light";
 
 const LANG_KEY = "svod-lang";
 const THEME_KEY = "svod-theme";
@@ -158,12 +174,19 @@ function ansiToHtml(text) {
                 state.italic = true;
             } else if (n === 4) {
                 state.underline = true;
-            } else if (n === 38 && parts[i + 1] === "5") {
-                const x = parseInt(parts[i + 2], 10);
-                if (ansi256[x]) {
-                    state.fg = ansi256[x];
+            } else if (n === 38 && parts[i + 1] === "2") {
+                const r = parseInt(parts[i + 2], 10);
+                const g = parseInt(parts[i + 3], 10);
+                const b = parseInt(parts[i + 4], 10);
+                // The formatter bakes the canonical dark palette; re-color the
+                // run to the active theme's slot so the terminal matches it.
+                const slot = tomorrowSlot(r, g, b);
+                if (slot) {
+                    state.fg = "rgb(" + TOMORROW[themeMode][slot].join(",") + ")";
+                } else {
+                    state.fg = `rgb(${r},${g},${b})`;
                 }
-                i += 2;
+                i += 4;
             } else if (ansiColors[n]) {
                 state.fg = ansiColors[n];
             }
@@ -181,7 +204,9 @@ async function main() {
     await init();
     setup_panic_hook();
 
-    const svod = new Svod();
+    // The language must be chosen before the interpreter is built so the
+    // built-in constants materialize in the right locale.
+    const svod = new Svod(resolvedLang());
 
     const taglines = {
         en: "<strong>Svod</strong> is a modern calculation interpreter designed for engineering computations and technical report generation.",
@@ -293,8 +318,8 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
     function applyTheme(theme) {
         const dark = theme === "dark";
         document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-        ansiColors = dark ? DARK_ANSI_COLORS : LIGHT_ANSI_COLORS;
-        ansi256 = dark ? DARK_ANSI_256 : LIGHT_ANSI_256;
+        ansiColors = dark ? ANSI_COLORS.dark : ANSI_COLORS.light;
+        themeMode = dark ? "dark" : "light";
         const meta = themeTargetMeta(theme);
         const label = meta.label[document.getElementById("lang").value];
         themeButton.textContent = meta.icon;

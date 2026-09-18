@@ -48,12 +48,17 @@ export class Svod {
      */
     is_incomplete(code: string): boolean;
     /**
-     * Creates a fresh interpreter.
+     * Creates a fresh interpreter for `lang` (`"ru"` selects Russian, anything
+     * else English).
+     *
+     * The language is applied before the interpreter is built, so the built-in
+     * constants materialize in the right locale — the browser does not choose
+     * the language until after construction otherwise.
      *
      * A `Default` implementation makes no sense for the JavaScript-facing
      * constructor, so the clippy `new_without_default` lint is allowed here.
      */
-    constructor();
+    constructor(lang: string);
     /**
      * Queues a raw user answer (a number with an optional unit, or a choice
      * index/prefix) for the current submission's next prompt.
@@ -66,6 +71,9 @@ export class Svod {
     reset_input(): void;
     /**
      * Sets the output language: `"ru"` selects Russian, anything else English.
+     *
+     * Affects subsequent output and messages; values already bound in the
+     * session keep the language they were materialized in.
      */
     set_lang(lang: string): void;
 }
@@ -116,7 +124,7 @@ export interface InitOutput {
     readonly svod_highlight: (a: number, b: number, c: number, d: number) => void;
     readonly svod_interpret: (a: number, b: number, c: number) => number;
     readonly svod_is_incomplete: (a: number, b: number, c: number) => number;
-    readonly svod_new: () => number;
+    readonly svod_new: (a: number, b: number) => number;
     readonly svod_queue_input: (a: number, b: number, c: number) => void;
     readonly svod_reset_input: (a: number) => void;
     readonly svod_set_lang: (a: number, b: number, c: number) => void;
