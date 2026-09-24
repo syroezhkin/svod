@@ -235,7 +235,7 @@ async function main() {
   sqrt(a) where a = 16 end        -- local bindings (a is visible in the value)
   v = choice(75, 50)              -- pick from a list into a variable
   match v case 75 then "A" case 50 then "B" else "?" end  -- branch on v
-  input N as kN : axial force;    -- input parameter (the browser will ask)
+  input N as kN desc "axial force";  -- input parameter (the browser will ask)
   A = 10 cm2                      -- cross-section area
   σ = N / A                       -- axial stress
   check(σ <= 160 MPa)             -- strength check
@@ -258,7 +258,7 @@ Output can be rendered as Typst or LaTeX with :format typst / :format latex.
   sqrt(a) where a = 16 end        -- локальные привязки (a доступна в значении)
   v = choice(75, 50)              -- выбор из списка в переменную
   match v case 75 then "A" case 50 then "B" else "?" end  -- ветвление по v
-  input N as кН : осевое усилие;  -- входной параметр (браузер спросит значение)
+  input N as кН desc "осевое усилие";  -- входной параметр (браузер спросит значение)
   A = 10 см2                      -- площадь сечения
   σ = N / A                       -- напряжение в стержне
   check(σ <= 160 МПа)             -- проверка прочности
